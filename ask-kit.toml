@@ -1,0 +1,49 @@
+id = "temet.notes"
+name = "notes"
+version = "0.1.0"
+min_ask_kit = "0.3.0"
+says = "the user's own notes, a folder of Markdown files (an Obsidian vault, a Logseq graph, a notes or decision-records folder): what I wrote about something and when, what I decided and why, my open, overdue and done tasks, today's or any day's daily note, what I wrote this week, which notes link to a note or carry a tag, broken links and orphans; and writing to them (append to a note, add a task, tick one off, create a note, capture a line in today's daily note)"
+keywords = ["my notes", "in (my|the) (notes|vault)", "obsidian", "logseq", "second brain", "zettelkasten", "daily notes?", "my journal", "backlinks?", "wiki ?links?", "orphan notes?", "my (open |overdue |outstanding )?(tasks|to-?dos?)", "to-?do list", "what did i (write|note|jot)", "what did i decide", "decision records?", "meeting notes"]
+route_hint = "what the user wrote in their own Markdown notes (an Obsidian vault, a Logseq graph, a notes or decision-records folder: what they wrote or decided about something, their tasks, daily notes, tags, links between notes) and adding to those notes is notes; what an agent session said, decided or did is sessions or mike; a repository's code, its docs folder and its own ADRs are code, and whether those docs still match the code is docs-check; reviewing or rewriting prose for style is writing; CLAUDE.md, rules and memory files are rules; how Claude Code works is claude-code-docs"
+cite = "the note's path and line (`cases/WATCH-12.md:21`) and the note's date"
+instructions = "instructions.md"
+acts = ["notes.append", "notes.create", "notes.task", "notes.check", "notes.capture"]
+
+[[settings]]
+key = "NOTES_DIR"
+about = "the folder that holds the notes (an Obsidian vault, a Logseq graph, a folder of Markdown files)"
+required = true
+
+[[settings]]
+key = "NOTES_DAILY"
+about = "where daily notes live and how they are named, such as daily/YYYY-MM-DD.md; by default found from the folder (.obsidian/daily-notes.json, a Logseq journals folder, or notes named like dates)"
+
+[[settings]]
+key = "NOTES_PRIVATE_TAGS"
+about = "tags that make a note private: it is counted and named by title, never searched or quoted"
+default = "private,secret"
+
+[[settings]]
+key = "WORKDIR"
+about = "the folder a relative NOTES_DIR or `vault` is resolved against; by default the folder the agent runs in"
+detect = ["node", "-e", "process.stdout.write(process.cwd())"]
+
+[[sources]]
+kind = "module"
+name = "notes"
+module = "notes.mjs"
+api = "api.d.ts"
+
+[[actions]]
+name = "open-tasks"
+title = "The open tasks in the notes, overdue first"
+script = "tasks"
+match = ['(?:what|which) (?:are|is) (?:my|the|our) (?:open |outstanding |pending )?(?:tasks?|to-?dos?)(?: in (?:my|the|our) notes)?', '(?:list|show)(?: me)? (?:my|the|our) (?:open |outstanding |pending )?(?:tasks?|to-?dos?)(?: in (?:my|the|our) notes)?', 'what is on my to-?do list']
+expect = '"groups"'
+
+[[actions]]
+name = "daily-note"
+title = "Today's or yesterday's daily note"
+script = "daily"
+match = ['what(?: i|\x27)s in (?:my |the )?(?:daily|journal) note (?:for |of |from )?(?<date>today|yesterday)', 'what(?: i|\x27)s in (?<date>today|yesterday)\x27?s (?:daily|journal) note', '(?:show|read)(?: me)? (?<date>today|yesterday)\x27?s (?:daily|journal) note']
+expect = '"exists": true'

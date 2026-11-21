@@ -1,0 +1,118 @@
+{
+  "database": "bench/fixture/vault, a small Obsidian vault of the Ankh-Morpork City Watch: 20 notes of which one is private by front matter, two by tag (#secret) and one is named like a credential (clacks-token.md), plus a hidden .obsidian folder and a .trash folder. A note holds a fake password, a URL with a fake password and a fake key. Run the bench from the kit's folder with NOTES_DIR set to the fixture: `NOTES_DIR=bench/fixture/vault ask-kit kit test notes`. Every question is a shot (a script and params, no model); `today` is fixed so overdue and 'this week' do not move. The expectations were checked against the fixture on 2026-11-21. Questions for the model (`q`) are still to be added from real sessions.",
+  "questions": [
+    {
+      "id": "overview",
+      "do": "overview",
+      "params": { "today": "2026-11-08" },
+      "expect": ["20 notes", "10 open tasks \\(2 overdue\\), 5 done", "2 orphans, 1 links to notes that do not exist; 3 private", "\"pattern\": \"daily/YYYY-MM-DD.md\"", "\"credentialNamed\": 1", "\"target\": \"Detritus\""]
+    },
+    {
+      "id": "find-topic",
+      "do": "find",
+      "params": { "words": "clacks ledger" },
+      "expect": ["11 of 17 notes hold clacks, ledger; best: cases/WATCH-12 Missing clacks ledger.md \\(2026-11-04\\)", "\"line\": 14", "signed out at two bells"]
+    },
+    {
+      "id": "find-private-not-searched",
+      "do": "find",
+      "params": { "words": "Misbegot Bridge" },
+      "expect": ["no note holds misbegot or bridge \\(17 notes searched\\)"]
+    },
+    {
+      "id": "find-masks-password",
+      "do": "find",
+      "params": { "words": "tower login password" },
+      "expect": ["Tower login password: \\[redacted\\]", "best: Cable Street.md \\(2026-11-04\\)"]
+    },
+    {
+      "id": "find-secret-value-not-searched",
+      "do": "find",
+      "params": { "words": "octarine fixture" },
+      "expect": ["no note holds octarine or fixture"]
+    },
+    {
+      "id": "decided-patrols",
+      "do": "decided",
+      "params": { "topic": "night patrols" },
+      "expect": ["1 decision on night patrols; best: decisions/ADR-001 Night patrols in pairs.md:12 \\(2026-10-14\\)", "\"status\": \"accepted\"", "Two constables were hurt in the Shades", "A lone officer in the Shades is a target"]
+    },
+    {
+      "id": "decided-none",
+      "do": "decided",
+      "params": { "topic": "pineapple" },
+      "expect": ["no decision on pineapple found in 17 notes"]
+    },
+    {
+      "id": "decided-inline",
+      "do": "decided",
+      "params": { "topic": "Mint detail" },
+      "expect": ["daily/2026-11-06.md:4", "Decided to keep Nobby off the Mint detail, because the petty cash tin is still missing"]
+    },
+    {
+      "id": "tasks-overdue",
+      "do": "tasks",
+      "params": { "due": "overdue", "today": "2026-11-08" },
+      "expect": ["2 open tasks: 2 overdue \\(oldest due 2026-10-30\\)", "people/Nobby Nobbs.md", "cases/WATCH-12 Missing clacks ledger.md"]
+    },
+    {
+      "id": "tasks-open",
+      "do": "tasks",
+      "params": { "today": "2026-11-08" },
+      "expect": ["10 open tasks: 2 overdue", "\"group\": \"due today\"", "Post the rota for the week of 9 November", "due:: 2026-11-20", "\"group\": \"no due date\""]
+    },
+    {
+      "id": "tasks-private-not-counted",
+      "do": "tasks",
+      "params": { "state": "all", "today": "2026-11-08" },
+      "expect": ["\"total\": 15", "\"done\": 5"]
+    },
+    {
+      "id": "daily-yesterday",
+      "do": "daily",
+      "params": { "date": "yesterday", "today": "2026-11-08" },
+      "expect": ["daily/2026-11-07.md \\(Saturday\\): 41 words", "Clacks from Cable Street came in on time"]
+    },
+    {
+      "id": "daily-missing",
+      "do": "daily",
+      "params": { "date": "today", "today": "2026-11-09" },
+      "expect": ["no daily note for 2026-11-09 \\(Monday\\); it would be daily/2026-11-09.md; the last one before it is 2026-11-08"]
+    },
+    {
+      "id": "daily-range",
+      "do": "daily",
+      "params": { "since": "week", "today": "2026-11-08" },
+      "expect": ["4 daily notes from 2026-11-02 to 2026-11-08", "\"tasksOpen\": 1"]
+    },
+    {
+      "id": "recent-week",
+      "do": "recent",
+      "params": { "since": "week", "today": "2026-11-08" },
+      "expect": ["7 notes from 2026-11-02 to 2026-11-08", "\"day\": \"2026-11-04\"", "Cable Street.md", "\"privateNotes\": 1"]
+    },
+    {
+      "id": "links-backlinks",
+      "do": "links",
+      "params": { "note": "Sam Vimes" },
+      "expect": ["people/Sam Vimes.md \\(matched by file name\\): 2 links in from 2 notes and 1 private", "\"fromPrivateNotes\"", "Havelock Vetinari", "\"line\": 19"]
+    },
+    {
+      "id": "links-trash-not-read",
+      "do": "links",
+      "params": { "note": "Old rota" },
+      "expect": ["no note .{1,2}Old rota.{1,2}; near: Rota.md"]
+    },
+    {
+      "id": "tags-nested",
+      "do": "tags",
+      "params": { "tag": "case" },
+      "expect": ["3 notes tagged case; newest: daily/2026-11-05.md \\(2026-11-05\\)", "case/open", "case/closed"]
+    },
+    {
+      "id": "tags-all",
+      "do": "tags",
+      "expect": ["13 tags; most used: watch \\(7\\), person \\(4\\), watch/officer \\(4\\)"]
+    }
+  ]
+}
